@@ -1,0 +1,157 @@
+\documentclass{article}
+\usepackage{listings}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{multicol}
+
+\newcommand{\setZ}{\mathbb{Z}}
+\renewcommand{\ttdefault}{pcr}
+\lstset{
+	backgroundcolor=\color{white},
+	basicstyle=\footnotesize\ttfamily,
+	breakatwhitespace=false,
+	breaklines=true,
+	frame=single,
+	% keepspaces=true,
+	language=Java,
+	rulecolor=\color{black},
+	showstringspaces=false,
+	tabsize=4,
+	commentstyle=\color{blue},
+	identifierstyle=\color{black},
+	stringstyle=\color{magenta},
+	deletekeywords={do,while,return,new,if,else,for},
+	morekeywords={*,...},
+	keywordstyle=\bfseries\color{OliveGreen},
+	emph={do,while,return,new,if,else,for},
+	emphstyle=\bfseries\color{Mahogany},
+	%title=\lstname
+}
+\begin{document}
+
+\tableofcontents
+
+\lstlistoflistings
+\newpage
+
+\section{Number Theory}
+\subsection{GCD and LCM}
+A common divisor $c$ of two integers $a$ and $b$ is an integer such that $a | c$ and $b | c$. The greatest common divisor $d$ is the largest such $c$, and has the property that for all common divisors $c$, $c | d$. \\
+Two integers are said to be relatively prime if their greatest common divisor is $1$. \\
+We can find the greatest common divisor of two numbers using Eulclid's algorithm:
+\lstinputlisting[linerange={5-29},caption=Finding the greatest common divisor]{src/NumberTheory.java}
+The least common multiple can be obtained by dividing the product by the greatest common divisor:
+\lstinputlisting[linerange={31-42},caption=Finding the least common multiple]{src/NumberTheory.java}
+
+\subsection{Diophantine Equations}
+Diophantine equations are equations in which variables only take on integer values. The typical form of a linear diophantine equation is $ax + by = c$, and there are infinitely solutions if $d = \gcd(a, b) \mid c$ and no solutions otherwise. We can obtain solutions by first obtaining an initial solution with the Bezout coefficients\footnote{Bezout's identity states that the greatest common divisor of two integers can always be obtained as a linear combination the two integers.} of $a$ and $b$:
+\lstinputlisting[linerange={44-80},caption=Obtaining Bezout coefficients]{src/NumberTheory.java}
+With $d$ as a linear combination of $a$ and $b$, $d = am + bn$, we can obtain an initial solution to our diophantine equation by multiplying both sides by $\frac{c}{d}$, yielding initial solutions $x_0 = \frac{mc}{d}$ and $y_0 = \frac{nc}{d}$. Then we can enuterate all solutions to the diophantine equation with
+\[ c = a \left(x_0 + t \cdot \frac{b}{d} \right) + b \left(y_0 - t \cdot \frac{a}{d} \right) \qquad \forall \; t \in \setZ \]
+\lstinputlisting[linerange={82-99},caption=Obtaining solutions to a linear diophantine equation]{src/NumberTheory.java}
+
+\subsection{Congruencies}
+Given the equation $ax \equiv b \mod n$, we obtain the equivalent diophantine equation $ax - ny = b$, which can be solved as above. Note that this has a solution only when $\gcd(a, n) \mid b$. \\
+The inverse of an integer $a$ mod $n$ (with $\gcd(a, n) = 1$) is a solution to the conguency $ax \equiv 1 \mod n$. This can be found by solving the corresponding diophantine equation:
+\lstinputlisting[linerange={101-111},caption=Obtaining the inverse of $a \bmod n$]{src/NumberTheory.java}
+\begin{itemize}
+\item Wilson's Thereom: For all positive integers $n > 1$, $(n - 1)! \equiv -1 \mod n$ if and only if $n$ is prime.
+\item Euler's Theorem: For all positive integers $a$ and $n$, $a^{\varphi(n)} \equiv 1 \mod n$ if and only if $\gcd(a,n) = 1$, where $\varphi(n)$ is the number of positive intgers less than $n$ that are relatively prime to $n$
+\end{itemize}
+
+\subsection{Chinese Remainder Theorem}
+The Chinese Remainder Theorem states that for pairwise relatively prime $n_i$s, the following system always has a solution, and that it is unique mod $N = n_1n_2\cdots n_k$:
+\begin{flalign*}
+	x \equiv a_1 & \mod n_1 \\
+	x \equiv a_2 & \mod n_2 \\
+	\vdots & \\
+	x \equiv a_k & \mod n_k
+\end{flalign*}
+and that the solution is equal to $\sum_{i = 1}^k a_iy_iN_i$, where $N_i = \frac{N}{n_i}$ and $y_i$ is the inverse of $N_i \bmod n_i$.
+\lstinputlisting[linerange={113-134},caption=Obtaining a solution to a Chinese Remainder Theorem Problem]{src/NumberTheory.java}
+
+\subsection{Prime Numbers}
+We can generate a list of primes by using the Sieve of Eratosthenes\footnote{Begin by creating a list of numbers from 2 up to a desired maximum. At each stage, the smallest number is guaranteed to be prime, and remove all multiples of that number from the list. Once the square root of the maximum is reached, all remaining numbers on the list are also guaranteed to be prime.}:
+\lstinputlisting[linerange={145-172},caption=Obtaining a list of prime numbers]{src/NumberTheory.java}
+\begin{itemize}
+	\item Euclid's Lemma: If $p$ is a prime and $p | ab$, then $p | a$ or $p | b$.
+	\item Dirichlet's Theorem on Arithmetic Progressions: For any two relatively prime integers $a$ and $d$, there are infinitely many primes of the form $a + nd$.
+\end{itemize}
+The power of a prime $p$ in the factorization of $n!$ is $\sum_{k = 1}^\infty \left \lfloor \frac{n}{p^k} \right \rfloor$. Note that this is not actually an infinite sum since all remaining terms are zero once $p^k$ exceeds $n$.
+\lstinputlisting[linerange={174-185},caption=Obtaining the power of a prime in $n!$]{src/NumberTheory.java}
+To find the number of zeroes at the end of $n!$, we need only consider the power of $5$ since $10 = 2 \cdot 5$ and the power of $2$ always exceeds that of $5$.
+
+\section{Combinatorics}
+\subsection{Binomial Coefficients}
+\lstinputlisting[linerange={5-18},caption=Obtaining binomial coefficients using Pascal's Triangle]{src/Combinatorics.java}
+The Binomial Theorem states that
+\[ (x + y)^n = \sum_{k = 0}^n \binom{n}{k} x^{n - k}y^k \]
+
+\subsection{Generating Functions}
+\nopagebreak
+\begin{multicols}{2}
+	\[ \frac{1}{1 - x} = \sum_{k = 0}^\infty x^k \]
+	\[ \frac{1}{(1 - x)^s} = \sum_{k = 0}^\infty \binom{k + s - 1}{s - 1}x^k  \]
+	\[ \frac{x}{(1 - x)^2} = \sum_{k = 0}^\infty k x^k \]
+	\[ e^x = \sum_{k = 0}^\infty \frac{x^k}{k!} \]
+\end{multicols}
+
+\subsection{Catalan Numbers}
+\[ C_n = \frac{1}{n + 1} \binom{2n}{n} = \binom{2n}{n} - \binom{2n}{n + 1} = \sum_{i = 0}^{n - 1} C_iC_{n - i - 1} = \{ 1, 1, 2, 5, 14, 42, 132, \dots \} \]
+\begin{itemize}
+\item number of expressions with $n$ pairs of correctly matched parentheses
+\item number of ways of associating $n$ applications of a binary operator
+\item number of lattice paths on an $n \times n$ grid that do not cross the diagonal
+\item number of ways a convex polygon with $n + 2$ sides can be cut into triangles
+\item number of ways to connect pairs of $2n$ points on a circle with no chords intersecting
+\item number of noncrossing partitions of an $n$-element set
+\end{itemize}
+
+\subsection{Colorings}
+For a cube:
+\begin{itemize}
+	\item cycle index of vertices: $\frac{1}{24} \left( x_1^8 + 6x_4^2 + 9x_2^4 + 8x_1^2x_3^2 \right)$
+	\item cycle index of edges: $\frac{1}{24} \left( x_1^{12} + 6x_4^3 + 3x_2^6 + 8x_3^4 + 6x_1^2x_2^5 \right)$
+	\item cycle index of faces: $\frac{1}{24} \left( x_1^6 + 6x_2^3 + 8x_3^2 + 3x_1^2x_2^2 + 6x_1^2x_4 \right)$
+\end{itemize}
+
+\section{Geometry}
+\lstinputlisting[linerange={19-21,28-44,51-51,133-137,146-159},caption={Basic Vector and Line classes}]{src/Geometry.java}
+\lstinputlisting[linerange={5-17},caption=Finding the area of a polygon with coordinates in two dimensions]{src/Geometry.java}
+\newpage
+\lstinputlisting[linerange={91-132},caption=Finding the convex hull of a set of points]{src/Geometry.java}
+Area of a triangle:
+\[ A = \sqrt{s (s - a)(s - b)(s - c)} \text{, where } s = \frac{a + b + c}{2} \hspace{2cm} A = \frac{1}{2} ab \sin C \]
+Area of a regular polygon:
+\[ A = \frac{nS^2}{2} \cdot \sin \left( \frac{2\pi}{n} \right) \text{, where $S$ is the length from center to corner} \]
+Triangle identities:
+\[ \frac{a}{\sin A} = \frac{b}{\sin B} = \frac{c}{\sin C} \hspace{2cm} c^2 = a^2 + b^2 - 2ab \cos C \]
+\[ \frac{a- b}{a + b} = \frac{\tan \left( \frac{A - B}{2} \right)}{\tan \left(\frac{A + B}{2} \right) } \]
+
+\newpage
+\section{General Algorithms}
+\lstinputlisting[linerange={16-44},caption=Performing a floodfill]{src/Algorithms.java}
+\lstinputlisting[linerange={46-75},caption=Obtaining the next permutation of an array]{src/Algorithms.java}
+\lstinputlisting[linerange={116-150},caption=Finding the longest increasing subsequence of a sequence]{src/Algorithms.java}
+\lstinputlisting[linerange={2-2,163-183},caption=Finding the longest common subsequence]{src/Algorithms.java}
+\newpage
+\lstinputlisting[linerange={2-2,184-207},caption=Finding the longest common substring]{src/Algorithms.java}
+\lstinputlisting[linerange={2-2,151-162},caption=Finding the maximum contiguous subarray]{src/Algorithms.java}
+\lstinputlisting[linerange={77-95},caption=Counting the number of ways to make change (order doesn't matter)]{src/Algorithms.java}
+\newpage
+\lstinputlisting[linerange={97-114},caption=Counting the number of ways to make change (order matters)]{src/Algorithms.java}
+
+\section{Graph Theory}
+\lstinputlisting[linerange={4-5,23-50,100-104,201},caption=Basic code in Graph class]{src/Graph.java}
+
+\newpage
+\subsection{Shortest Path}
+\lstinputlisting[linerange={106-160},caption=Dijkstra's algorithm for finding shortest path between two vertices]{src/Graph.java}
+
+\newpage
+\subsection{Minimal Spanning Tree}
+\lstinputlisting[linerange={6-22,161-200},caption=Kruskal's algorithm for finding minimal spanning tree]{src/Graph.java}
+
+\end{document}

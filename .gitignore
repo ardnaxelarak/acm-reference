@@ -1,0 +1,6 @@
+*.swp
+*.aux
+*.lol
+*.toc
+*.log
+build/*
