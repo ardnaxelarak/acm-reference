@@ -1,18 +1,9 @@
 import java.util.*;
+import java.awt.Point;
 import static java.lang.Math.max;
 
 public class Algorithms
 {
-	public static class Point
-	{
-		int x, y;
-		public Point(int x, int y)
-		{
-			this.x = x;
-			this.y = y;
-		}
-	}
-
 	public static void floodfill(int[][] array, Point node, int target, int replacement)
 	{
 		if (array[node.y][node.x] != target)
